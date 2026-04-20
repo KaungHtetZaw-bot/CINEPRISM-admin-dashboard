@@ -28,8 +28,8 @@
           <div class="card-glass-bg"></div>
           
           <div class="card-header">
-            <span class="type-badge" :class="item.type.toLowerCase().replace(' ', '-')">
-              {{ item.type }}
+            <span class="type-badge" :class="item.payment_type.name.toLowerCase().replace(' ', '-')">
+              {{ item.payment_type.name }}
             </span>
             <div class="card-actions">
               <el-button link class="edit-btn" @click="openDialog(item)"><el-icon><Edit /></el-icon></el-button>

@@ -24,7 +24,7 @@
     </div>
 
     <div class="table-container">
-      <el-table :data="filteredPurchases" v-loading="adminStore.isLoading" class="premium-table">
+      <el-table :data="paginatedPurchases" v-loading="adminStore.isLoading" class="premium-table">
         <el-table-column label="Subscriber" min-width="240">
           <template #default="scope">
             <div class="user-profile">
@@ -82,13 +82,15 @@
             <div v-if="scope.row.status === 'pending'" class="decision-group">
               <el-button 
                 class="approve-btn"
-                @click="adminStore.updatePurchaseStatus(scope.row.id, 'approved')"
+                aria-disabled="adminStore.isLoading"
+                @click.stop="adminStore.updatePurchaseStatus(scope.row.id, 'approve')"
               >
                 <el-icon><Check /></el-icon>
               </el-button>
               <el-button 
                 class="reject-btn"
-                @click="adminStore.updatePurchaseStatus(scope.row.id, 'rejected')"
+                aria-disabled="adminStore.isLoading"
+                @click.stop="adminStore.updatePurchaseStatus(scope.row.id, 'reject')"
               >
                 <el-icon><Close /></el-icon>
               </el-button>

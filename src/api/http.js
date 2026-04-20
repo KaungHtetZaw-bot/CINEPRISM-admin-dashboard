@@ -52,11 +52,13 @@ http.interceptors.response.use(
         const response = await axios.post(`${http.defaults.baseURL}/refresh`, {}, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
         })
-        const newToken = response.data.acess_token
-        authStore.token = newToken
-        localStorage.setItem('token', newToken)
-        originalRequest.headers.Authorization = `Bearer ${newToken}`
-        return http(originalRequest)
+        const newToken = response.data.access_token
+        if (newToken) {
+          authStore.token = newToken
+          localStorage.setItem('token', newToken)
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+          return http(originalRequest)
+        }
       } catch (refreshError) {
         authStore.logout()
         router.replace('/login')

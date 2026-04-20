@@ -92,8 +92,11 @@ export const useAdminStore = defineStore('admin', {
       }
     },
     async updatePurchaseStatus(id, status) {
+      this.isLoading = true
+      let user = JSON.parse(localStorage.getItem('user'))
+      let provider_id = user.id
       try {
-        await http.patch(`/purchases/${id}`, { status })
+        await http.patch(`/purchases/${id}/${status}`, { provider_id })
         const index = this.purchases.findIndex(p => p.id === id)
         if (index !== -1) this.purchases[index].status = status
         ElMessage({
@@ -101,8 +104,12 @@ export const useAdminStore = defineStore('admin', {
           type: status === 'approved' ? 'success' : 'info',
           plain: true
         });
+        this.isLoading = false
       } catch (error) {
-        ElMessage.error(error.response?.data?.message || "Status update failed");
+        ElMessage.error(error.response?.data?.message || `failed to ${status}`);
+      }
+      finally{
+        this.isLoading = false
       }
     }
     
