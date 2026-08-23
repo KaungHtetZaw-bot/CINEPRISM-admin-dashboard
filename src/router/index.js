@@ -79,7 +79,6 @@ router.afterEach(() => {
 router.beforeEach((to, from, next) => {
   nprogress.start();
   const token = localStorage.getItem('token');
-  const roleId = parseInt(localStorage.getItem('role_id'));
 
   document.title = to.meta.title ? `${to.meta.title} | Movie Admin` : 'Movie Admin';
 
@@ -87,12 +86,8 @@ router.beforeEach((to, from, next) => {
     return next('/login');
   }
 
-  if (to.path.startsWith('/') && to.path !== '/login' && to.path !== '/register') {
-      if(roleId === 1) {
-          localStorage.removeItem('token');
-          return next('/login');
-      }
-  }
+  // Non-admin logins are already rejected in the auth store and the API
+  // enforces admin-only access via middleware on protected endpoints.
 
   if (to.meta.guestOnly && token) {
     return next('/dashboard');

@@ -1,4 +1,3 @@
-import router from '@/router'
 import { useAuthStore } from '@/store/auth'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
@@ -36,6 +35,28 @@ http.interceptors.request.use(
  * Response interceptor
  * - Global error handling
  */
+
+// Single-flight refresh: concurrent 401s share one refresh call
+let refreshPromise = null
+
+function refreshToken() {
+  if (!refreshPromise) {
+    refreshPromise = axios.post(`${http.defaults.baseURL}/refresh`, {}, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+      .then(response => {
+        const newToken = response.data?.access_token
+        if (!newToken) throw new Error('No access token in refresh response')
+        localStorage.setItem('token', newToken)
+        return newToken
+      })
+      .finally(() => {
+        refreshPromise = null
+      })
+  }
+  return refreshPromise
+}
+
 http.interceptors.response.use(
   res => {
     nprogress.done();
@@ -46,22 +67,18 @@ http.interceptors.response.use(
     const originalRequest = err.config
     const status = err.response?.status
 
-    if(status === 401 && !originalRequest._retry && !['/login', '/register'].includes(originalRequest.url)) {
+    if(status === 401 && !originalRequest._retry && !['/login', '/register', '/verify-code', '/refresh'].includes(originalRequest.url)) {
       originalRequest._retry = true
       try {
-        const response = await axios.post(`${http.defaults.baseURL}/refresh`, {}, {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        })
-        const newToken = response.data.access_token
-        if (newToken) {
-          authStore.token = newToken
-          localStorage.setItem('token', newToken)
-          originalRequest.headers.Authorization = `Bearer ${newToken}`
-          return http(originalRequest)
-        }
+        const newToken = await refreshToken()
+
+        const store = useAuthStore()
+        store.token = newToken
+
+        originalRequest.headers.Authorization = `Bearer ${newToken}`
+        return http(originalRequest)
       } catch (refreshError) {
         authStore.logout()
-        router.replace('/login')
         return Promise.reject(refreshError)
       }
     }

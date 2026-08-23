@@ -103,8 +103,8 @@
         </el-button>
 
         <p class="resend-text">
-          Didn't receive the code? 
-          <el-button link type="primary" @click="handleRegister">Resend</el-button>
+          Didn't receive the code?
+          <el-button link type="primary" @click="handleResend">Resend</el-button>
         </p>
       </div>
     </el-dialog>
@@ -162,14 +162,30 @@ const handleRegister = async () => {
     await registerFormRef.value.validate()
     await http.post('/register', registerForm)
     showOtpDialog.value = true;
-    console.log('Registration successful, OTP dialog shown.',showOtpDialog.value);
   } catch (error) {
-    console.error('Registration error:', error?.password_confirmation);
-    const name = error?.name?.[0]?.message;
-    const ConfirmPassword = error?.password_confirmation?.[0]?.message || error?.password_confirmation?.[0]?.error;
-    ElMessage.error(name || ConfirmPassword || error.response?.data?.message || 'Registration failed. Please try again.')
+    // Element Plus validation rejection has no `response`; surface API errors otherwise
+    const data = error.response?.data
+    const message = typeof data?.errors === 'string'
+      ? data.errors
+      : data?.errors?.[0] || data?.message
+    ElMessage.error(message || 'Registration failed. Please try again.')
   } finally {
     loading.value = false
+  }
+}
+
+const handleResend = async () => {
+  if (!registerForm.email) {
+    ElMessage.error('Please enter your email first.')
+    return
+  }
+  try {
+    await http.post('/register', { email: registerForm.email })
+    ElMessage.success('A new verification code has been sent to your email.')
+  } catch (error) {
+    const data = error.response?.data
+    const message = typeof data?.errors === 'string' ? data.errors : data?.message
+    ElMessage.error(message || 'Failed to resend code. Please try again.')
   }
 }
 
@@ -194,34 +210,22 @@ const submitVerification = async () => {
   }
   try {
     isVerifying.value = true;
-    await registerFormRef.value.validate(async (valid) => {
-    if (valid) {
-      loading.value = true
-      try {
-        const payload = {
-          ...registerForm,
-          code: otpCode
-        };
-        console.log('Submitting OTP code:', typeof(otpCode), otpCode);
-        await http.post('/verify-code', payload)
-        ElMessage({
-          message: 'Account Created! Please contact a Super Admin to activate your access.',
-          type: 'warning',
-          duration: 6000,
-          showClose: true,
-          customClass: 'premium-message'
-        })
-        router.push('/login')
-      } catch (error) {
-        console.log('OTP verification error:', error);
-        ElMessage.error(error.response?.data?.message || 'Registration failed')
-      } finally {
-        loading.value = false
-      }
+    loading.value = true
+    try {
+      await http.post('/verify-code', { ...registerForm, code: otpCode })
+      ElMessage({
+        message: 'Account Created! Please contact a Super Admin to activate your access.',
+        type: 'warning',
+        duration: 6000,
+        showClose: true,
+        customClass: 'premium-message'
+      })
+      router.push('/login')
+    } catch (error) {
+      ElMessage.error(error.response?.data?.message || 'Verification failed. Please check the code.')
+    } finally {
+      loading.value = false
     }
-  })
-  } catch (error) {
-    ElMessage.error(error.response?.data?.message || 'OTP verification failed. Please try again.');
   } finally {
     isVerifying.value = false;
   }

@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('authUser', {
         token: localStorage.getItem('token') || null,
     }),
     getters: {
-     
+        isAdmin: (state) => [2, 3].includes(state.user?.role_id),
     },
     actions: {
         async fetchProfile() {
@@ -26,21 +26,21 @@ export const useAuthStore = defineStore('authUser', {
                 this.isLoadingProfile = false
             }
         },
-         async login(form,router){
+        async login(form, router){
+            this.isLoading = true
             try {
-                this.isLoading = false
                 const res = await http.post('/login',form)
                 const role = res?.user?.role_id
-                if(role == 1){
+                if(role === 1){
                     ElMessage({
-                        message: err.message || 'Access Restricted: Administrator Only',
+                        message: 'Access Restricted: Administrator Only',
                         type: 'error',
                     })
                     return
                 }
                 this.token = res.access_token;
                 this.user = res.user;
-                
+
                 localStorage.setItem('token', res.access_token);
                 localStorage.setItem('user', JSON.stringify(res.user));
                 ElMessage.success('Welcome back!');
@@ -57,9 +57,8 @@ export const useAuthStore = defineStore('authUser', {
             this.token = null;
             localStorage.removeItem('token');
             localStorage.removeItem('user');
-            // Using window.location forces a clean state reload
+            // Full reload guarantees a clean state, same behavior as http.js 401 handling
             window.location.href = '/login';
-    }
+        }
     }
 })
-

@@ -93,8 +93,6 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table :data="paginatedUsers" v-loading="adminStore.loadStates.users" class="premium-table">
-      </el-table>
 
       <div class="table-footer">
         <div class="pagination-info">
@@ -117,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Search, StarFilled, MoreFilled, User, Delete, Filter } from '@element-plus/icons-vue';
 import http from '@/api/http';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -145,10 +143,6 @@ const paginatedUsers = computed(() => {
   return searchedUsers.value.slice(start, end);
 });
 
-const handleSearch = () => {
-  currentPage.value = 1;
-};
-
 const handleDelete = (id) => {
   ElMessageBox.confirm('This action will permanently revoke user access. Continue?', 'Archive User', {
     confirmButtonText: 'Revoke Access',
@@ -165,26 +159,13 @@ const handleDelete = (id) => {
   });
 };
 
-const editDrawer = reactive({
-  visible: false,
-  submitting: false
-});
-
-const editForm = reactive({
-  id: null,
-  name: '',
-  email: '',
-  role_id: 1
-});
-
 const handleRoleChange = async (user, newRoleId) => {
   try {
     const res = await http.patch(`/users/${user.id}/change-profile`, { role_id: newRoleId });
     ElMessage.success(res?.message || 'Member profile updated successfully');
     adminStore.fetchUsers();
   } catch (error) {
-    console.error(error.message);
-    ElMessage.error(error.message || "Update failed. Please check your connection.");
+    ElMessage.error(error.response?.data?.message || error.response?.data?.errors?.[0] || "Update failed. Please check your connection.");
   }
 };
 
@@ -324,67 +305,4 @@ $ease: cubic-bezier(0.25, 1, 0.5, 1);
   .delete-action { color: #ef4444; &:hover { background: #fef2f2 !important; } }
 }
 
-/* DRAWER INTEGRATION */
-:deep(.premium-drawer) {
-  background: white;
-  border-left: 1px solid #f1f5f9;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.04);
-
-  .el-drawer__header {
-    margin-bottom: 0;
-    padding: 30px;
-    border-bottom: 1px solid #f1f5f9;
-  }
-
-  .drawer-header-custom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    
-    .category-tag { font-size: 10px; font-weight: 800; color: #3b82f6; text-transform: uppercase; letter-spacing: 1px; }
-    h3 { margin: 4px 0 0; font-size: 20px; font-weight: 800; color: $text-main; }
-    
-    .close-btn { 
-      border: 1px solid #e2e8f0; border-radius: 50%; width: 32px; height: 32px; padding: 0;
-      color: $text-muted; &:hover { background: #f8fafc; color: $text-main; }
-    }
-  }
-
-  .drawer-body {
-    padding: 30px;
-
-    .profile-card-mini {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px;
-      background: #f8fafc;
-      border-radius: 16px;
-      margin-bottom: 30px;
-      
-      h4 { margin: 0; font-weight: 700; color: $text-main; }
-      p { margin: 2px 0 0; font-size: 12px; color: $text-muted; font-family: monospace; }
-    }
-  }
-
-  .edit-form {
-    :deep(.el-form-item__label) { font-weight: 700; color: $text-main; font-size: 13px; }
-    :deep(.el-input__wrapper) { 
-        background: #f8fafc; border-radius: 12px; box-shadow: none !important; border: 1px solid #e2e8f0; 
-        &.is-focus { border-color: #3b82f6; background: white; }
-    }
-  }
-
-  .drawer-footer {
-    padding: 20px 30px;
-    border-top: 1px solid #f1f5f9;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    
-    .el-button { height: 45px; border-radius: 12px; font-weight: 700; }
-    .save-btn { background: $text-main; border: none; &:hover { transform: translateY(-1px); } }
-  }
-}
 </style>

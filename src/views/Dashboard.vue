@@ -7,8 +7,8 @@
         <p>Insights and system activity for the movie platform.</p>
       </div>
       <div class="header-actions">
-        <el-button class="premium-btn" @click="adminStore.fetchAllData()">
-          <el-icon class="mr-8"><Download /></el-icon> Generate Report
+        <el-button class="premium-btn" :loading="adminStore.isLoading" @click="adminStore.fetchAllData()">
+          <el-icon class="mr-8"><Download /></el-icon> Refresh Data
         </el-button>
       </div>
     </header>
@@ -29,9 +29,6 @@
                 <template v-if="card.isCurrency"><small>Ks</small></template>
                 {{ formatNumber(card.value) }}
               </h2>
-              <div class="card-trend positive">
-                <el-icon><Top /></el-icon> 12% growth
-              </div>
             </div>
           </div>
         </div>
@@ -42,9 +39,6 @@
       <div class="section-title">
         <div class="title-left">
           <h3>Recent Subscriptions</h3>
-          <span class="live-indicator">
-            <span class="ping"></span> Real-time
-          </span>
         </div>
         <el-button link class="view-all-link" @click="router.push('/purchases')">
           View All Activity <el-icon class="ml-4"><ArrowRight /></el-icon>
@@ -96,7 +90,7 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { User, Timer, CircleCheck, Money, Download, Top } from '@element-plus/icons-vue'
+import { User, Timer, CircleCheck, Money, Download } from '@element-plus/icons-vue'
 import { useAdminStore } from '@/store/admin'
 import { formatDate,formatNumber } from '@/utils/helpers'
 
@@ -107,7 +101,7 @@ const metricCards = computed(() => [
   { title: 'Total Users', value: adminStore.users.length, icon: User, color: '#6366f1', route: '/users' },
   { title: 'Pending Tasks', value: adminStore.pendingCount, icon: Timer, color: '#f59e0b', route: '/purchases' },
   { title: 'Successful', value: adminStore.successCount, icon: CircleCheck, color: '#10b981', route: '/purchases' },
-  { title: 'Gross Revenue', value: adminStore.totalRevenue, icon: Money, color: '#0f172a', isCurrency: true, route: '/dashboard' },
+  { title: 'Gross Revenue', value: adminStore.totalRevenue, icon: Money, color: '#0f172a', isCurrency: true, route: '/purchases' },
 ])
 
 onMounted(async () => {
@@ -190,24 +184,6 @@ $ease-premium: cubic-bezier(0.25, 1, 0.5, 1);
   display: flex;
   align-items: center;
   gap: 16px;
-  
-  .live-indicator {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: $text-muted;
-    font-weight: 600;
-    
-    .ping {
-      width: 8px; height: 8px; border-radius: 50%; background: #10b981;
-      animation: indicator-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
-    }
-  }
-}
-
-@keyframes indicator-ping {
-  75%, 100% { transform: scale(2); opacity: 0; }
 }
 
 .view-all-link {

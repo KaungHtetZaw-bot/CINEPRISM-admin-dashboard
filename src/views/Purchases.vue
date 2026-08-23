@@ -80,16 +80,16 @@
         <el-table-column label="Decision" align="right" min-width="200">
           <template #default="scope">
             <div v-if="scope.row.status === 'pending'" class="decision-group">
-              <el-button 
+              <el-button
                 class="approve-btn"
-                aria-disabled="adminStore.isLoading"
+                :disabled="adminStore.isLoading"
                 @click.stop="adminStore.updatePurchaseStatus(scope.row.id, 'approve')"
               >
                 <el-icon><Check /></el-icon>
               </el-button>
-              <el-button 
+              <el-button
                 class="reject-btn"
-                aria-disabled="adminStore.isLoading"
+                :disabled="adminStore.isLoading"
                 @click.stop="adminStore.updatePurchaseStatus(scope.row.id, 'reject')"
               >
                 <el-icon><Close /></el-icon>
@@ -104,7 +104,7 @@
 
       <div class="table-footer">
         <div class="pagination-info">
-          Showing {{ paginatedPurchases.length }} transactions
+          Showing {{ paginatedPurchases.length }} of {{ filteredPurchases.length }} transactions
         </div>
         
         <el-pagination
@@ -143,11 +143,6 @@ const filteredPurchases = computed(() => {
 watch(activeTab, () => {
   currentPage.value = 1;
 });
-
-const getStatusType = (status) => {
-  const map = { pending: 'warning', approved: 'success', rejected: 'danger' }
-  return map[status] || 'info'
-}
 
 onMounted(() => {
   adminStore.fetchAllData()
@@ -222,9 +217,8 @@ $ease: cubic-bezier(0.25, 1, 0.5, 1);
   }
 
   .table-container {
-    height: calc(100vh - 300px); 
+    height: calc(100vh - 300px);
     min-height: 400px;
-    display: flex;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

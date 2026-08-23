@@ -17,8 +17,8 @@
         <span class="value">{{ payments.length }}</span>
       </div>
       <div class="stat-pill">
-        <span class="label">System Status</span>
-        <span class="value status-ok">Operational</span>
+        <span class="label">Payment Types</span>
+        <span class="value">{{ uniqueTypeCount }}</span>
       </div>
     </div>
 
@@ -94,7 +94,7 @@
   </div>
 </template>
 <script setup>
-import { ref, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, reactive } from 'vue'
 import { Plus, Edit, Delete, DocumentCopy } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import http from '@/api/http'
@@ -106,6 +106,10 @@ const submitting = ref(false)
 
 const form = reactive({ id: null, type: '', name: '', number: '' })
 
+const uniqueTypeCount = computed(() =>
+  new Set(payments.value.map(p => p.payment_type?.name).filter(Boolean)).size
+)
+
 const fetchPayments = async () => {
   try {
     const res = await http.get('/payments')
@@ -113,11 +117,6 @@ const fetchPayments = async () => {
   } catch (error) {
     ElMessage.error("Failed to load payment methods")
   }
-}
-
-const getTagType = (type) => {
-  const types = { 'Bank': 'primary', 'Mobile Wallet': 'success', 'Crypto': 'warning' }
-  return types[type] || 'info'
 }
 
 const openDialog = (item = null) => {
@@ -182,6 +181,8 @@ const submitForm = async () => {
     }
     dialogVisible.value = false
     fetchPayments()
+  } catch (error) {
+    ElMessage.error(error.response?.data?.message || error.response?.data?.errors?.[0] || 'Failed to save gateway. Please check your input.')
   } finally {
     submitting.value = false
   }
@@ -196,9 +197,13 @@ const handleDelete = (id) => {
     center: true,
     showClose: false,
   }).then(async () => {
-    await http.delete(`/payments/${id}`)
-    ElMessage.success('Deleted')
-    fetchPayments()
+    try {
+      await http.delete(`/payments/${id}`)
+      ElMessage.success('Deleted')
+      fetchPayments()
+    } catch (error) {
+      ElMessage.error('Failed to delete gateway')
+    }
   })
 }
 

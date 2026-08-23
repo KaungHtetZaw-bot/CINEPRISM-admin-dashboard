@@ -17,8 +17,8 @@
 
     <div class="right-section">
       <div class="action-item">
-        <el-badge :value="5" :offset="[0, 5]" class="custom-badge">
-          <el-icon class="icon-btn"><Bell /></el-icon>
+        <el-badge is-dot :hidden="!adminStore.pendingCount" :value="adminStore.pendingCount" :offset="[0, 5]" class="custom-badge">
+          <el-icon class="icon-btn" @click="router.push('/purchases')"><Bell /></el-icon>
         </el-badge>
       </div>
 
