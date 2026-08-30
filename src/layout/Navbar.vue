@@ -1,54 +1,37 @@
 <template>
-  <div class="navbar-container">
+  <header class="navbar-container">
     <div class="left-section">
-      <div class="toggle-wrapper" @click="adminStore.toggleSidebar">
-        <div class="burger-icon" :class="{ 'is-active': !adminStore.isSidebarCollapsed }">
-          <span></span>
-          <span></span>
-        </div>
-      </div>
-
-      <div class="breadcrumb-wrapper">
-        <span class="root-path">Home</span>
-        <span class="separator">/</span>
-        <span class="current-path">{{ currentRouteName }}</span>
-      </div>
+      <button class="toggle-wrapper" type="button" aria-label="Toggle sidebar" @click="adminStore.toggleSidebar">
+        <span></span><span></span>
+      </button>
+      <div class="breadcrumb-wrapper"><span>Workspace</span><i>/</i><strong>{{ currentRouteName }}</strong></div>
     </div>
 
     <div class="right-section">
-      <div class="action-item">
-        <el-badge is-dot :hidden="!adminStore.pendingCount" :value="adminStore.pendingCount" :offset="[0, 5]" class="custom-badge">
-          <el-icon class="icon-btn" @click="router.push('/purchases')"><Bell /></el-icon>
-        </el-badge>
-      </div>
-
-      <el-dropdown trigger="click" border-radius="12">
-        <div class="user-trigger">
-          <div class="avatar-wrapper">
-            <img src="https://ui-avatars.com/api/?name=Admin&background=0f172a&color=fff" alt="admin">
-          </div>
-          <div class="user-meta">
-            <span class="username">{{ authStore?.user?.name }}</span>
-            <span class="role">{{ authStore?.user?.role?.name }}</span>
-          </div>
+      <button class="notification-button" type="button" aria-label="Open purchase queue" @click="router.push('/purchases')">
+        <el-badge is-dot :hidden="!adminStore.pendingCount"><el-icon><Bell /></el-icon></el-badge>
+      </button>
+      <el-dropdown trigger="click">
+        <button class="user-trigger" type="button">
+          <div class="avatar-wrapper"><img src="https://ui-avatars.com/api/?name=Admin&background=261f37&color=eadfff&bold=true" alt="Admin profile"></div>
+          <div class="user-meta"><strong>{{ authStore?.user?.name || 'Administrator' }}</strong><span>{{ authStore?.user?.role?.name || 'Operations' }}</span></div>
           <el-icon class="chevron"><ArrowDown /></el-icon>
-        </div>
-        
+        </button>
         <template #dropdown>
           <el-dropdown-menu class="premium-dropdown">
-            <el-dropdown-item :icon="User" @click="router.push('/profile')">Profile</el-dropdown-item>
-            <el-dropdown-item :icon="Setting" @click="router.push('/setting')">System Settings</el-dropdown-item>
+            <el-dropdown-item :icon="User" @click="router.push('/profile')">Your profile</el-dropdown-item>
+            <el-dropdown-item :icon="Setting" @click="router.push('/setting')">System settings</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
     </div>
-  </div>
+  </header>
 </template>
+
 <script setup>
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Bell, ArrowDown, User, Setting, SwitchButton } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
+import { Bell, ArrowDown, User, Setting } from '@element-plus/icons-vue'
 import { useAdminStore } from '@/store/admin'
 import { useAuthStore } from '@/store/auth'
 
@@ -56,163 +39,10 @@ const route = useRoute()
 const router = useRouter()
 const adminStore = useAdminStore()
 const authStore = useAuthStore()
-
-
-const currentRouteName = computed(() => route.meta.title || 'Overview')
+const currentRouteName = computed(() => route.meta.title || 'Command center')
 </script>
+
 <style lang="scss" scoped>
-$text-main: #0f172a;
-$text-muted: #64748b;
-$bg-hover: #f8fafc;
-$ease: cubic-bezier(0.25, 1, 0.5, 1);
-
-.navbar-container {
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32px;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-
-  .left-section {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-
-    .toggle-wrapper {
-      cursor: pointer;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 10px;
-      transition: background 0.4s $ease;
-      &:hover { 
-        background: $bg-hover;
-       }
-
-      .burger-icon {
-        width: 18px;
-        height: 12px;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        
-        span {
-          display: block;
-          height: 2px;
-          width: 100%;
-          background: $text-main;
-          border-radius: 2px;
-          transition: all 0.4s $ease;
-        }
-
-        &.is-active span:nth-child(2) { width: 60%; }
-      }
-    }
-
-    .breadcrumb-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 14px;
-      letter-spacing: -0.2px;
-
-      .root-path { 
-        color: $text-muted; 
-        font-weight: 400; 
-      }
-      .separator { 
-        color: #cbd5e1; 
-        font-size: 12px; 
-      }
-      .current-path { 
-        color: $text-main; 
-        font-weight: 600; 
-      }
-    }
-  }
-
-  .right-section {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-
-    .action-item {
-      padding: 10px;
-      cursor: pointer;
-      border-radius: 10px;
-      transition: background 0.3s $ease;
-      &:hover { 
-        background: $bg-hover; }
-      
-      .icon-btn { 
-        font-size: 20px; 
-        color: $text-main; 
-      }
-    }
-
-    .user-trigger {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 12px;
-      transition: all 0.3s $ease;
-
-      &:hover {
-        background: $bg-hover;
-        .chevron { 
-          transform: translateY(2px); 
-        }
-      }
-
-      .avatar-wrapper {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        img { 
-          width: 100%; 
-          height: 100%; 
-          object-fit: cover; 
-        }
-      }
-
-      .user-meta {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.2;
-        
-        .username { 
-          font-size: 14px; 
-          font-weight: 600; 
-          color: $text-main; 
-        }
-        .role { 
-          font-size: 11px; 
-          font-weight: 500; 
-          color: $text-muted; 
-          text-transform: uppercase; 
-          letter-spacing: 0.5px; 
-        }
-      }
-
-      .chevron { 
-        font-size: 12px; 
-        color: $text-muted; 
-        transition: transform 0.3s $ease; 
-      }
-    }
-  }
-}
+.navbar-container { display: flex; height: 72px; align-items: center; justify-content: space-between; padding: 0 32px; border-bottom: 1px solid #e8e6ed; background: rgba(250,249,252,.88); backdrop-filter: blur(16px); }.left-section, .right-section { display: flex; align-items: center; }.left-section { gap: 18px; }.toggle-wrapper { display: grid; width: 36px; height: 36px; place-content: center; gap: 5px; padding: 0; border: 1px solid #e5e2ea; border-radius: 10px; background: #fff; cursor: pointer; transition: .2s; &:hover { border-color:#c8bce4; background:#f7f4ff; } span { display:block; width:15px; height:1.5px; border-radius:2px; background:#3a3147; &:nth-child(2){width:10px;} } }.breadcrumb-wrapper { display: flex; align-items: center; gap: 9px; color: #9b95a3; font-size: 12px; }.breadcrumb-wrapper i { color: #c8c2cd; font-style: normal; }.breadcrumb-wrapper strong { color: #4a4157; font-weight: 700; }.right-section { gap: 12px; }.notification-button { display: grid; width: 36px; height: 36px; place-items: center; padding: 0; border: 1px solid transparent; border-radius: 10px; color: #5c536a; background: transparent; cursor: pointer; transition:.2s; &:hover { border-color:#e5e1ed; background:#fff; color:#6746cf; } .el-icon { font-size:18px; } }.user-trigger { display: flex; align-items: center; gap: 9px; padding: 4px 7px 4px 4px; border: 1px solid transparent; border-radius: 11px; background: transparent; cursor: pointer; transition:.2s; &:hover { border-color:#e5e1ed; background:#fff; } }.avatar-wrapper { width: 32px; height: 32px; overflow:hidden; border-radius: 9px; background:#261f37; img { display:block; width:100%; height:100%; object-fit:cover; } }.user-meta { display:grid; gap:2px; text-align:left; }.user-meta strong { max-width:150px; overflow:hidden; color:#342c3f; font-size:12px; text-overflow:ellipsis; white-space:nowrap; }.user-meta span { color:#9d96a7; font-size:10px; text-transform:capitalize; }.chevron { color:#9e97a8; font-size:11px; }
+@media (max-width: 600px) { .navbar-container { padding: 0 18px; }.breadcrumb-wrapper span, .breadcrumb-wrapper i, .user-meta, .chevron { display:none; }.left-section { gap:8px; } }
 </style>

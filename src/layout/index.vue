@@ -1,16 +1,13 @@
 <template>
   <el-container class="layout-wrapper">
     <el-aside 
-      :width="adminStore.isSidebarCollapsed ? '20px' : '0px'" 
+      :width="adminStore.isSidebarCollapsed ? '80px' : '260px'"
       class="aside-container"
     >
       <Sidebar />
     </el-aside>
 
-    <el-container 
-      class="main-container" 
-      :style="{ marginLeft: adminStore.isSidebarCollapsed ? '80px' : '260px' }"
-    >
+    <el-container class="main-container">
       <el-header height="72px"> <Navbar />
       </el-header>
 
@@ -36,17 +33,9 @@ const adminStore = useAdminStore()
 $ease-premium: cubic-bezier(0.25, 1, 0.5, 1);
 $duration: 0.5s;
 
-.layout-wrapper {
-  min-height: 100vh;
-  background-color: #fcfcfd; // Cleaner, almost-white background
-}
+.layout-wrapper { min-height: 100vh; background-color: #f8f7fa; }
 
-.aside-container {
-  transition: width $duration $ease-premium;
-  overflow: hidden;
-  z-index: 1001;
-  background: #fff;
-}
+.aside-container { transition: width $duration $ease-premium; overflow: hidden; z-index: 1001; background: #11111e; }
 
 .main-container {
   transition: margin-left $duration $ease-premium;
@@ -64,10 +53,7 @@ $duration: 0.5s;
   z-index: 1000;
 }
 
-.content-body {
-  padding: 24px 32px; // generous spacing for premium feel
-  overflow-x: hidden;
-}
+.content-body { padding: 28px 32px 40px; overflow-x: hidden; }
 
 /* PREMIUM PAGE TRANSITION 
    Instead of just sliding, it slightly scales for a "depth" effect
@@ -85,5 +71,11 @@ $duration: 0.5s;
 .page-slide-leave-to {
   opacity: 0;
   transform: translateY(-10px) scale(1.01);
+}
+
+@media (max-width: 760px) {
+  .aside-container { width: 0 !important; }
+  .main-container { margin-left: 0 !important; }
+  .content-body { padding: 18px; }
 }
 </style>
