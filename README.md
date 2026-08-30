@@ -1,38 +1,55 @@
-# movie-app-admin-dashboard
+# CinePrism - Vue Admin Dashboard
 
-This template should help get you started developing with Vue 3 in Vite.
+[React frontend](https://cineprism-frontend.vercel.app/) · [Frontend repository](https://github.com/KaungHtetZaw-bot/CINEPRISM_Frontend) · [Laravel API](https://github.com/KaungHtetZaw-bot/movie-app-backend)
 
-## Recommended IDE Setup
+This Vue dashboard is the operations interface for CinePrism. It gives administrators a focused place to review VIP purchase receipts and manage the product data behind the customer-facing movie and TV application.
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Features
 
-## Recommended Browser Setup
+- Review and approve or reject VIP purchase requests
+- Manage subscription plans and payment accounts
+- View and manage users with role-aware access
+- Work with operational settings and dashboard data
+- Use JWT-protected API requests with token refresh handling
+- Resolve image paths from the Laravel API and show request progress feedback
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Stack
 
-## Customize configuration
+- Vue 3 and Vue Router
+- Pinia for client state
+- Element Plus UI components
+- Axios and NProgress
+- Vite and Sass
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Run locally
 
-## Project Setup
+Prerequisites: a running CinePrism Laravel API and Node.js 20.19+ or 22.12+.
 
-```sh
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Create a `.env` file:
 
-```sh
+```env
+VITE_API_BASE_URL=http://127.0.0.1:8000/api
+VITE_IMAGE_BASE_URL=http://127.0.0.1:8000
+```
+
+Then run:
+
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+## Available scripts
 
-```sh
+```bash
+npm run dev
 npm run build
+npm run preview
 ```
+
+## Project status
+
+This dashboard is part of the CinePrism portfolio prototype. It is designed to demonstrate a real operational workflow rather than a generic admin template.
